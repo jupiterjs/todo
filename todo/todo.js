@@ -1,3 +1,4 @@
+steal.loadedProductionCSS = true;
 steal.css('todo')
 	.plugins('jquery/model/list',
 	'jquery/controller',
