@@ -109,9 +109,16 @@ $.Model.List('Todo.List',{
 
 
 /**
- * A Todos widget
+ * A Todos widget created like
  * 
- *    $("#todos").todos({list: new Todo.List()})
+ *    $("#todos").todos({ list: new Todo.List() });
+ *    
+ * It listens on changes to the list and items in the list with the following actions:
+ * 
+ *   - "{list} add"    - todos being added to the list
+ *   - "{list} remove" - todos being removed from the list
+ *   - "{list} update" - todos being updated in the list
+ *   
  */
 $.Controller('Todos',{
 	
