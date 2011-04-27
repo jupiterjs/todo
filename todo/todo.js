@@ -1,9 +1,10 @@
-steal.loadedProductionCSS = true;
+// Load what we need
 steal.css('todo')
-	.plugins('jquery/model/list',
-	'jquery/controller',
-	'jquery/view/ejs',
-	'jquery/lang/json').then(function($){
+	 .plugins('jquery/model/list',
+		'jquery/controller',
+		'jquery/view/ejs',
+		'jquery/lang/json')
+	 .then(function($){
 
 // a helper for retrieving JSON data from localStorage
 var localStore = function(name, cb, self){
@@ -72,20 +73,32 @@ $.Model.List('Todo.List',{
 // A todos widget
 $.Controller('Todos',{
 	
-	//setup and finding
+	// sets up the widget
 	init : function(){
+		
+		// empties the create input element
 		this.find(".create").val("")[0].focus();
+		
+		// fills this list of items (creates add events on the list)
 		this.options.list.findAll();
 	},
 	
-	//adds existing and created to the list
+	// adds existing and created to the list
 	"{list} add" : function(list, ev, items){
-	 	this.find('#list').append("todosEJS",items)
-	 	this.updateStats();
+	 	
+		// uses the todosEJS template (in todo.html) to render a list of items
+		// then adds those items to #list
+		this.find('#list').append("todosEJS",items)
+	 	
+		// calls a helper to update the stats info
+		this.updateStats();
 	},
 	
-	//creating
+	// Creating a todo --------------
+	
+	// listens for key events and creates a new todo
 	".create keyup" : function(el, ev){
+		
 		if(ev.keyCode == 13){
 			new Todo({
 				text : el.val(),
@@ -95,58 +108,71 @@ $.Controller('Todos',{
 			el.val("");
 		}
 	},
+	
+	// When a todo is created, add it to this list
 	"created" : function(todo){
 		this.options.list.push(todo); //triggers 'add' on the list
 	},
 	
-	//destroying
-	".clear click" : function(){
+	// Destroying a todo --------------
+	
+	// the clear button is clicked
+	".todo-clear click" : function(){
+		// gets completed todos in the list, destroys them
 		this.options.list.completed()
-		.destroyAll(); //this is calling on the list, needs to be implemented
-		//but confusing
+			.destroyAll(); 
+
 	},
 	
-	
-	".todo mouseover" : function(){
-		//show delete
-	},
+	// When a todo's destroy button is clicked.
 	".todo .destroy click" : function(el){
 		el.closest('.todo').model().destroy();
 	},
+	
+	// when an item is removed from the list ...
 	"{list} remove" : function(list, ev, items){
+		
+		// get the elements in the list and remove them
 		items.elements(this.element).slideUp(function(){
 			$(this).remove();
 		});
+		
 		this.updateStats();
 	},
 	
-	".todo-clear click" : function(){
-		this.options.list.completed().destroyAll();
-	},
 	
-	// Update
+	// Updating a todo --------------
 	
+	// when the checkbox changes, update the model
 	".todo [name=complete] change" : function(el, ev){
 		var todo = el.closest('.todo').model().update({
 			complete : el.is(':checked')
 		});
 	},
 	
+	// switch to edit mode
 	".todo dblclick" : function(el){
 		var input = $("<input name='text' class='text'/>").val(el.model().text)
 		el.html(input);
 		input[0].focus();
 	},
+	
+	// update the todo's text on blur
 	".todo [name=text] focusout" : function(el, ev){
+		
 		var todo = el.closest('.todo').model().update({
 			text : el.val()
 		});
 	},
+	
+	// when an item is updated
 	"{list} update" : function(list, ev, item){
 		item.elements().html("todoEJS", item);
 		this.updateStats();
 		//update completed
 	},
+	
+	// a helper that updates the stats
 	updateStats : function(){
 		var list = this.options.list,
 			completed = list.completed().length;
@@ -161,6 +187,8 @@ $.Controller('Todos',{
 
 
 $(function(){
+	
+	// create a todos widget with a list
 	$("#todos").todos({list : new Todo.List()});
 })
 
