@@ -6,62 +6,100 @@ steal.css('todo')
 		'jquery/lang/json')
 	 .then(function($){
 
-// a helper for retrieving JSON data from localStorage
-var localStore = function(name, cb, self){
-	var data = $.evalJSON( window.localStorage[name] || (window.localStorage[name] = "{}") ),
-		res = cb.call(self, data);
-	if(res !== false){
-		window.localStorage[name] = $.toJSON(data);
-	}
-};
-
-// A todo model for CRUDing todos.
+/**
+ * A todo model for CRUDing todos.
+ */
 $.Model('Todo',{
-	findAll : function(ids, success, error){
-		localStore("todos", function(todos){
+	/**
+	 * Gets JSON data from localStorage.  Any changes that 
+	 * get made in cb get written back to localStorage.
+	 * 
+	 * This is unimportant for understanding JavaScriptMVC!
+	 */
+	localStore: function(cb){
+		var name = this.shortName,
+			data = $.evalJSON( window.localStorage[name] || (window.localStorage[name] = "{}") ),
+			res = cb.call(this, data);
+		if(res !== false){
+			window.localStorage[name] = $.toJSON(data);
+		}
+	},
+	/**
+	 * Gets todos from localStorage.
+	 * 
+	 *     Todo.findAll({}, success(todos))
+	 */
+	findAll: function(params , success){
+		this.localStore(function(todos){
 			instances = [];
 			for(var id in todos){
-				if(!ids || !ids.length || $.inArray(id, ids)){
-					instances.push( new this( todos[id]) )
-				}
+				instances.push( new this( todos[id]) )
 			}
 			success && success(instances)
-		}, this)
+		})
 	},
-	destroyAll : function(ids, success, error){
-		localStore("todos",function(todos){
+	/**
+	 * Destroys a list of todos by id from localStorage
+	 *     
+	 *     Todo.destroyAll([1,2], success())
+	 */
+	destroyAll: function(ids, success){
+		this.localStore(function(todos){
 			$.each(ids, function(){
 				delete todos[this]
 			});
 		});
 		success();
 	},
-	destroy : function(id, success){
-		localStore("todos",function(todos){
-			delete[id]
-		})
-		success();
+	/**
+	 * Destroys a single todo by id
+	 *     
+	 *     Todo.destroyAll(1, success())
+	 */
+	destroy: function(id, success){
+		this.destroyAll([id], successs)
 	},
-	create : function(attrs, success, error){
-		localStore("todos",function(todos){
+	/**
+	 * Creates a todo with the provided attrs.  This allows:
+	 * 
+	 *     new Todo({text: 'hello'}).save( success(todo) );
+	 */
+	create: function(attrs, success){
+		this.localStore(function(todos){
 			attrs.id = attrs.id || parseInt(100000 *Math.random())
 			todos[attrs.id] = attrs;
 		});
 		success({id : attrs.id})
 	},
-	update : function(id, attrs, success){
-		localStore("todos",function(todos){
+	/**
+	 * Updates a todo by id with the provided attrs.  This allows:
+	 * 
+	 *     todo.update({text: 'world'}, success(todos) )
+	 */
+	update: function(id, attrs, success){
+		this.localStore(function(todos){
 			var todo = todos[id];
 			$.extend(todo, attrs);
 		});
 		success({});
 	}
+	
 },{});
 
-// A list of todos.  
+/**
+ * Helper methods on collections of todos.  But lists can also use their model's 
+ * methods.  Ex:
+ * 
+ *   var todos = [new Todo({id: 5}) , new Todo({id: 6})],
+ *       list = new Todo.List(todos);
+ *       
+ *   list.destroyAll() -> calls Todo.destroyAll with [5,6].
+ */
 $.Model.List('Todo.List',{
 	
-	// A helper for making a list of completed todos.
+	/**
+	 * Return a new Todo.List of only complete items
+	 */
 	completed : function(){
 		return this.grep(function(item){
 			return item.complete === true;
@@ -70,7 +108,11 @@ $.Model.List('Todo.List',{
 });
 
 
-// A todos widget
+/**
+ * A Todos widget
+ * 
+ *    $("#todos").todos({list: new Todo.List()})
+ */
 $.Controller('Todos',{
 	
 	// sets up the widget
