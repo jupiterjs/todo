@@ -17,7 +17,7 @@
 		<script type='text/ejs' id='todosEJS'>
 			<% for(var i =0; i < this.length ; i++){ %>
 				<li <%= this[i]%>>
-				<%= $.View('todoEJS',this[i] ) %>
+				<%== $.View('todoEJS',this[i] ) %>
 				</li>
 			<% } %>
 		</script>
