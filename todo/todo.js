@@ -31,7 +31,7 @@ $.Model('Todo',{
 	 */
 	findAll: function(params , success){
 		this.localStore(function(todos){
-			instances = [];
+			var instances = [];
 			for(var id in todos){
 				instances.push( new this( todos[id]) )
 			}
@@ -57,7 +57,7 @@ $.Model('Todo',{
 	 *     Todo.destroyAll(1, success())
 	 */
 	destroy: function(id, success){
-		this.destroyAll([id], successs)
+		this.destroyAll([id], success)
 	},
 	/**
 	 * Creates a todo with the provided attrs.  This allows:
