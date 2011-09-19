@@ -1,10 +1,10 @@
 // Load what we need
 steal('jquery/model/list',
-		  'jquery/controller',
-		  'jquery/view/ejs',
-		  'jquery/lang/json')
-  .then('./todo.css')
-	.then(function($){
+      'jquery/controller',
+      'jquery/view/ejs',
+      'jquery/lang/json',
+      './todo.css',
+      function($){
 
 /**
  * A todo model for CRUDing todos.
