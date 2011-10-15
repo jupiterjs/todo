@@ -39,25 +39,12 @@ $.Model('Todo',{
 		})
 	},
 	/**
-	 * Destroys a list of todos by id from localStorage
-	 *     
-	 *     Todo.destroyAll([1,2], success())
-	 */
-	destroyAll: function(ids, success){
-		this.localStore(function(todos){
-			$.each(ids, function(){
-				delete todos[this]
-			});
-		});
-		success();
-	},
-	/**
 	 * Destroys a single todo by id
 	 *     
-	 *     Todo.destroyAll(1, success())
+	 *     Todo.destroy(1, success())
 	 */
 	destroy: function(id, success){
-		this.destroyAll([id], success)
+		this.List.destroy([id], success)
 	},
 	/**
 	 * Creates a todo with the provided attrs.  This allows:
@@ -95,7 +82,23 @@ $.Model('Todo',{
  *       
  *   list.destroyAll() -> calls Todo.destroyAll with [5,6].
  */
-$.Model.List('Todo.List',{
+$.Model.List('Todo.List',
+{
+	/**
+	 * Destroys a list of todos by id from localStorage
+	 *     
+	 *     Todo.destroy([1,2], success())
+	 */
+	destroy : function(ids, success, error){
+		this.namespace.localStore(function(todos){
+			$.each(ids, function(){
+				delete todos[this]
+			});
+		});
+		success();
+	}	
+},
+{
 	
 	/**
 	 * Return a new Todo.List of only complete items
@@ -169,7 +172,7 @@ $.Controller('Todos',{
 	".todo-clear click" : function(){
 		// gets completed todos in the list, destroys them
 		this.options.list.completed()
-			.destroyAll(); 
+			.destroy(); 
 
 	},
 	
@@ -215,7 +218,7 @@ $.Controller('Todos',{
 	},
 	
 	// when an item is updated
-	"{list} update" : function(list, ev, item){
+	"{list} updated" : function(list, ev, item){
 		item.elements().html("todoEJS", item);
 		this.updateStats();
 		//update completed
