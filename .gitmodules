@@ -7,6 +7,6 @@
 [submodule "can"]
 	path = can
 	url = git@github.com:jupiterjs/canjs.git
-[submodule "jquerypp"]
-	path = jquerypp
+[submodule "jquery"]
+	path = jquery
 	url = git@github.com:jupiterjs/jquerypp.git

@@ -1,4 +1,5 @@
-steal('can/model').then(function() {
+steal('can/model',
+	'jquery/lang/json').then(function() {
 
 	// Basic Todo entry model
 	// { text: 'todo', complete: false }
@@ -6,14 +7,14 @@ steal('can/model').then(function() {
 
 		// Implement local storage handling
 		localStore: function(cb){
-			var name = 'todos-canjs-jquery',
-				data = JSON.parse( window.localStorage[name] || (window.localStorage[name] = '[]') ),
+			var name = 'todos-jmvc',
+				data = $.evalJSON( window.localStorage[name] || (window.localStorage[name] = '[]') ),
 				res = cb.call(this, data);
 			if(res !== false){
 				can.each(data, function(i, todo) {
 					delete todo.editing;
 				});
-				window.localStorage[name] = JSON.stringify(data);
+				window.localStorage[name] = $.toJSON(data);
 			}
 		},
 
@@ -22,7 +23,7 @@ steal('can/model').then(function() {
 			this.localStore(function(todos){
 				var instances = [],
 					self = this;
-				can.each(todos, function(i, todo) {
+				can.each(todos, function(todo, i) {
 					instances.push(new self(todo));
 				});
 				def.resolve({data: instances});
