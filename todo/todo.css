@@ -206,3 +206,9 @@ body {
 #credits a {
 	color: #888;
 }
+
+#main.show,
+#stats.show,
+#stats.show #clear-completed {
+  display: block;
+}
